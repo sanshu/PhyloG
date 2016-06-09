@@ -98,3 +98,9 @@ body {
         border-bottom: 0;
     }
 }
+#toolbar{
+    margin: 5px;
+    padding: 2px 5px;
+    position: absolute;
+    z-index:500;
+}
