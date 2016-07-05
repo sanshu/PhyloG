@@ -45,27 +45,69 @@
             <div class="panel panel-info">
                 <div class="panel-heading">Info</div>
                 <div class="panel-body">
-                    <p>Below is displayed phylogenetic tree for 
-                    <a href="http://www.ncbi.nlm.nih.gov/genomes/VirusVariation/Database/nph-select.cgi?aln_type=P&cmd=show_query&country=any&fgenomeregion=12&genregion=NS5&go=database&host=any&isolation=any&orderby=collection_date%20desc&prev_cmd=show_query&searchin=sequence&sequence=P&srcfilter_labs=include&taxid=64320&tgenomeregion=12&view=P" 
-                       target="_blank">NS5</a> Zika virus protein.</p>
-                    <p>
-                        Green pins represent location (country) of particular strain collection site.<br/>
-                        Branches of phylogenetic tree are colored based on distance from leaf node, with white being closest.
-                    </p>
+                    <h4>View precalculated visualizations</h4>
+                    <div class="col-xs-12">
+                        <p>Below is displayed 3D phylogenetic tree for 
+                            Zika virus proteins. You can switch between different proteins using the drop-down menu in the top left corner of the viewer.</p>
+                        <p>
+                            Green pins represent location (country) of particular strain collection site.<br/>
+                            Branches of phylogenetic tree are colored based on distance from leaf node, with white being closest.
+                        </p>
+                    </div>
+
+<!--                    <h4> Use your own data</h4>
+
+                    <form>
+
+
+                        <div class="form-group">
+                            <label for="metatxt">Metadata</label>
+                            <code>"Accession","Length","Country","Host","Date","Unkn","CollectionDate","Definition","gi","GenomeRegion"</code>
+                            <textarea class="form-control" rows="3" id="metatxt"></textarea>
+                        </div>
+                        <div class="col-xs-12 col-md-5">
+
+                            <textarea class="form-control" rows="3" id="treetxt"></textarea>
+                        </div>
+                        <div class="col-xs-12 col-md-2">
+                            <button id="displaybtn" type="submit">Display</button>
+
+                        </div>
+
+                    </form>-->
+                    <!--
+                                        <table class="pgraph" id="pgraph1" style="margin-bottom:1em"><tbody>
+                                                <tr id="pgraph1a">
+                                                    <th class="struct" colspan="3"><abbr title="Structural proteins"><span>Structural</span></abbr></th>
+                                                    <th class="nonstruct" colspan="8"><abbr title="Non-structural proteins"><span>Non-structural</span></abbr></th>
+                                                </tr>
+                                                <tr id="pgraph1b">
+                                                    <td class="reg_C struct"><a href="#"><abbr title="Capsid">C</abbr></a></td>
+                                                    <td class="reg_prM struct"><a href="#"><abbr title="M protein">prM</abbr></a></td>
+                                                    <td class="reg_E struct selected"><a href="#"><abbr title="E protein">E</abbr></a></td>
+                                                    <td class="reg_NS1 "><a href="#"><abbr title="">NS1</abbr></a></td>
+                                                    <td class="reg_NS2A "><a href="#"><abbr title="">NS2A</abbr></a></td>
+                                                    <td class="reg_NS2B "><a href="#"><abbr title="">NS2B</abbr></a></td>
+                                                    <td class="reg_NS3 "><a href="#"><abbr title="">NS3</abbr></a></td>
+                                                    <td class="reg_NS4A "><a href="#"><abbr title="">NS4A</abbr></a></td>
+                                                    <td class="reg_2K "><a href="#"><abbr title="">2K</abbr></a></td>
+                                                    <td class="reg_NS4B "><a href="#"><abbr title="">NS4B</abbr></a></td>
+                                                    <td class="reg_NS5  selected"><a href="#"><abbr title="">NS5</abbr></a></td>
+                                                </tr>
+                                            </tbody></table>-->
                 </div>
             </div>  
-           
-            <div id="cesiumContainer" class="fullSize"> <div id="toolbar"></div></div>
-          
+
+            <div id="cesiumContainer" class="fullSize"> <div id="toolbar"></div><div id=""messagebox"></div></div>
+
             <!--            <div id="loadingOverlay"><h1>Loading...</h1></div>
-                        -->
+            -->
 
 
             <div class="footer">
                 <p>2016 SBPMDI</p>
             </div>
         </div>
-
 
         <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
         <script>
@@ -114,5 +156,14 @@
         <!-- build:js scripts/main.js -->
         <script src="scripts/main.js"></script>
         <!-- endbuild -->
+        
+        
+        <script>
+            $(document).ready(function () {
+                $("#displaybtn").click(function () {
+                    $("#toolbar > select").val("user");
+                });
+            });
+        </script>
     </body>
 </html>

@@ -38,49 +38,76 @@
 
 
     var options = [
-        {
-            text: 'C',
+        {text: 'C',
+            value: 'C',
             onselect: function () {
                 createModel('C');
             }
         }, {
             text: 'prM',
+            value: 'prM',
             onselect: function () {
                 createModel('prM');
             }
         }, {
             text: 'E',
+            value: 'E',
             onselect: function () {
                 createModel('E');
             }
+        }, {text: 'NS1',
+            value: 'NS1',
+            onselect: function () {
+                createModel('NS1');
+            }
+        }, {text: 'NS2A',
+            value: 'NS2A',
+            onselect: function () {
+                createModel('NS2A');
+            }
         }, {
             text: 'NS5',
+            value: 'NS5',
             onselect: function () {
                 createModel('NS5');
             }
         }, {
             text: 'NS4B',
+            value: 'NS4B',
             onselect: function () {
                 createModel('NS4B');
             }
         }
+//        , {
+//            text: 'User data',
+//            value: 'user',
+//            onselect: function () {
+//                if ($("#metatxt").val().trim().lenght === 0) {
+//                    new Cesium.InfoBox("messagebox");
+//
+//                }
+//                createModelFromInput($("#metatxt").val(), $("#treetxt").val());
+//            }
+//        }
     ];
 
     PhyloGlobe.addToolbarMenu(options);
 
     /** general vars*/
-    var viewer = new Cesium.Viewer('cesiumContainer', {
-        imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
-            url: 'http://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer'
-        })
-    }
-    );
+    var viewer = new Cesium.Viewer('cesiumContainer'
+//    , {
+//        imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+//            url: 'http://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer'
+//        })
+//    }
+        );
     var pinBuilder = new Cesium.PinBuilder();
     var entities = viewer.entities;
     var minElevation = 100;
-    var scaleFactor = 5000000;
+    var scaleFactor = 10000000;
 
     var countries = {};
+    var countriesCount = {};
 
     var strains = {};
 
@@ -94,7 +121,7 @@
             //https://developers.google.com/public-data/docs/canonical/countries_csv
             var carray = $.csv.toObjects(data);
             carray.forEach(function (c) {
-                countries[c.name] = {lat: c.latitude, lon: c.longitude};
+                countries[c.name] = {lat: c.latitude, lon: c.longitude, count: 0};
             });
             console.log('Loaded geo data');
             createModel('NS5');
@@ -104,7 +131,7 @@
 
 
     function createModel(name) {
-         console.log('Loading data for protein '+name);
+        console.log('Loading data for protein ' + name);
         entities.removeAll();
         loadMetaData(name);
     }
@@ -114,8 +141,7 @@
         processDatapoints(metadata);
         console.log('Loaded meta data');
 
-        var tree = parseNewick(data);
-        console.log(tree);
+        var tree = parseNewick(treedata);
         console.log('Loaded tree data');
     }
 
@@ -140,7 +166,6 @@
             dataType: 'text',
             success: function (data) {
                 var tree = parseNewick(data);
-                console.log(tree);
                 console.log('Loaded tree data');
             }
         });
@@ -148,9 +173,10 @@
 
 
     function processDatapoints(csv) {
+        countriesCount = {};
         var header = '"Accession","Length","Country","Host","Date","Unkn","CollectionDate","Definition","gi","GenomeRegion"';
         console.log('required metadata header:\n' + header);
-        var datapoints = $.csv.toObjects(header + '\n' + csv);//, {delimiter:" ", separator:"\t"});
+        var datapoints = $.csv.toObjects(header + '\n' + csv);
         datapoints.forEach(function (d) {
             var c = countries[d.Country];
             if (c) {
@@ -160,11 +186,22 @@
                 console.log('Unable to determine location lat:lon for ' + d.Country + '. Will use 0:0');
                 d.lat = 0;
                 d.lon = 0;
-
             }
+
+            c = countriesCount[d.Country];
+            if (c) {
+                c.count++;
+                c.strains.push(d);
+            } else {
+                c = {count: 1};
+                c.strains = [];
+                c.strains.push(d);
+            }
+            countriesCount[d.Country] = c;
+
             strains[d.Accession] = d;
         });
-//    console.log(datapoints);
+        console.log(countriesCount);
     }
 
     function parseNewick(newick) {
@@ -191,29 +228,42 @@
 
         if (node.IsLeaf()) {
             var strain = strains[node.label];
-            node.xyz = strain === null ? [0, 0, minElevation] : [parseFloat(strain.lat), parseFloat(strain.lon), minElevation + node.edge_length * scaleFactor];
-
+            var xy = getAdjustedCoordinates(strain);
+            node.xyz = strain === null ? [0, 0, minElevation] : [parseFloat(strain.lat), parseFloat(strain.lon), minElevation];//+ node.edge_length * scaleFactor];
+            node.strain = strain;
         } else {
             var left = assignCoordinates(node.child);
             var right = assignCoordinates(node.child.sibling);
             node.xyz = [(left[0] + right[0]) / 2,
                 (left[1] + right[1]) / 2,
-                Math.max(parseFloat(left[2]) + parseFloat(right[2])) + node.edge_length * scaleFactor];
+                Math.max(left[2], right[2]) + .01 * scaleFactor];
 //        console.log("left: " + left + ", right: " + right + " node: " + node.xyz);
         }
         return node.xyz;
     }
 
 
+    function getAdjustedCoordinates(s) {
+        var res = [0,0];
+
+        var c = countriesCount[s.Country];
+        //var delta =
+        console.log()
+        return res;
+    }
 
     function draw(tree) {
-
         drawEdges(tree.root, tree.root.depth);
         tree.nodes.forEach(function (n) {
             if (n.IsLeaf()) {
                 var entity = entities.add({
                     parent: ptree,
                     position: Cesium.Cartesian3.fromDegrees(n.xyz[1], n.xyz[0], n.xyz[2]),
+                    description: "<dl><dt>Accession</dt><dd><a href='http://www.ncbi.nlm.nih.gov/protein/" + n.strain.Accession + "'>" + n.strain.Accession + "</a>" +
+                        "</dd><dt>Date</dt><dd>" + n.strain.Date +
+                        "</dd><dt>Collection country</dt><dd>" + n.strain.Country +
+                        "</dd><dt>Host</dt><dd>" + n.strain.Host +
+                        "</dd><dt>Definition</dt><dd>" + n.strain.Definition + "</dd></dl>",
                     label: {
                         text: n.label,
                         font: '14pt monospace',

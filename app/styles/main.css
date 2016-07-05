@@ -104,3 +104,17 @@ body {
     position: absolute;
     z-index:500;
 }
+
+
+
+.pgraph .reg_C { width: 3% }
+.pgraph .reg_M, .pgraph .reg_prM { width: 4% }
+.pgraph .reg_E { width: 16% }
+.pgraph .reg_NS1  { width: 11% }
+.pgraph .reg_NS2A { width: 6% }
+.pgraph .reg_NS2B { width: 4% }
+.pgraph .reg_NS3  { width: 18% }
+.pgraph .reg_NS4A { width: 4% }
+.pgraph .reg_2K   { width: 2% }
+.pgraph .reg_NS4B { width: 7% }
+.pgraph .reg_NS5, .pgraph .reg_NS5B  { width: 26% }
